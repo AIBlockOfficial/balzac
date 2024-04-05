@@ -27,6 +27,7 @@
     </properties>
 
     <modules>
+        <module>../xyz.balzaclang.balzac.lib</module>
         <module>../xyz.balzaclang.balzac</module>
         <module>../xyz.balzaclang.balzac.ide</module>
         <module>../xyz.balzaclang.balzac.ui</module>
@@ -34,7 +35,6 @@
         <module>../xyz.balzaclang.balzac.target</module>
         <module>../xyz.balzaclang.balzac.feature</module>
         <module>../xyz.balzaclang.balzac.repository</module>
-        <module>../xyz.balzaclang.balzac.lib</module>
         <module>../xyz.balzaclang.balzac.logging</module>
 <!--         <module>../xyz.balzaclang.balzac.tests</module> -->
 <!--         <module>../xyz.balzaclang.balzac.ui.tests</module> -->

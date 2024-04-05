@@ -70,6 +70,7 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>11.0.20</version>
                 <configuration>
+					<skip>false</skip>
                     <webAppSourceDirectory>WebRoot</webAppSourceDirectory>
                     <webApp>
                         <war>${project.build.directory}/${project.build.finalName}.war</war>
