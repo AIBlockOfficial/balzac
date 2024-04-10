@@ -29,6 +29,7 @@ import xyz.balzaclang.balzac.TransactionParameter
 import xyz.balzaclang.lib.model.Address
 import xyz.balzaclang.lib.model.PrivateKey
 import xyz.balzaclang.lib.model.PublicKey
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType
 import xyz.balzaclang.utils.ASTUtils
 import xyz.balzaclang.xsemantics.BalzacStringRepresentation
 import org.eclipse.emf.ecore.EObject
@@ -103,7 +104,7 @@ class BalzacEObjectHoverProvider extends DefaultEObjectHoverProvider {
     }
 
     def dispatch String getDocumentationInternal(KeyLiteral key) '''
-        «val privKey = PrivateKey.fromBase58(key.value)»
+        «val privKey = PrivateKey.fromBase58(key.value, key.networkParams)»
         <pre>
             Private key
                 base58 (wif) = «privKey.wif»
@@ -125,14 +126,14 @@ class BalzacEObjectHoverProvider extends DefaultEObjectHoverProvider {
                 hex          = «pubkey.bytesAsString»
 
             Address
-                base58 (wif) [MAINNET] = «pubkey.toMainnetAddress.wif»
-                base58 (wif) [TESTNET] = «pubkey.toTestnetAddress.wif»
-                hash160                = «pubkey.toMainnetAddress.bytesAsString»
+                base58 (wif) [MAINNET] = «pubkey.toAddress(BitcoinNetworkType.MAINNET).wif»
+                base58 (wif) [TESTNET] = «pubkey.toAddress(BitcoinNetworkType.TESTNET).wif»
+                hash160                = «pubkey.toAddress(BitcoinNetworkType.MAINNET).bytesAsString»
         </pre>
         '''
 
     def dispatch String getDocumentationInternal(AddressLiteral addrLit) '''
-        «val addr = Address.fromBase58(addrLit.value)»
+        «val addr = Address.fromBase58(addrLit.value, addrLit.networkParams)»
         <pre>
             Address
                 base58 (wif) = «addr.wif»

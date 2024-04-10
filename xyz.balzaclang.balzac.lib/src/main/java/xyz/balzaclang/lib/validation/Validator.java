@@ -30,6 +30,7 @@ import org.bitcoinj.script.ScriptException;
 
 import xyz.balzaclang.lib.PrivateKeysStore;
 import xyz.balzaclang.lib.model.NetworkType;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.OutputScript;
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
 import xyz.balzaclang.lib.utils.BitcoinUtils;
@@ -83,20 +84,20 @@ public class Validator {
 
     public static ValidationResult validateRawTransaction(String bytes, NetworkType params) {
         return transactionExceptionHandler(() -> {
-            Transaction tx = new Transaction(params.toNetworkParameters(), BitcoinUtils.decode(bytes));
+            Transaction tx = new Transaction(((BitcoinNetworkType) params).toNetworkParameters(), BitcoinUtils.decode(bytes));
             tx.verify();
         });
     }
 
     public static ValidationResult validatePrivateKey(String wif, NetworkType params) {
         return base58ExceptionHandler(() -> {
-            DumpedPrivateKey.fromBase58(params.toNetworkParameters(), wif);
+            DumpedPrivateKey.fromBase58(((BitcoinNetworkType) params).toNetworkParameters(), wif);
         });
     }
 
     public static ValidationResult validateAddress(String wif, NetworkType params) {
         return base58ExceptionHandler(() -> {
-            Address.fromString(params.toNetworkParameters(), wif);
+            Address.fromString(((BitcoinNetworkType) params).toNetworkParameters(), wif);
         });
     }
 

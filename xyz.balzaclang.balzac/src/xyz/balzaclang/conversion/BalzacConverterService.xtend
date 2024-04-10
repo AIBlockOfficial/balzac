@@ -31,12 +31,14 @@ import xyz.balzaclang.lib.model.Address
 import xyz.balzaclang.lib.model.PrivateKey
 import xyz.balzaclang.lib.model.Signature
 import xyz.balzaclang.lib.utils.BitcoinUtils
+import xyz.balzaclang.utils.ASTUtils
 
 class BalzacConverterService extends DefaultTerminalConverters {
 
     @Inject NumberValueConverter numberValueConverter;
     @Inject TimestampValueConverter timestampTerminalConverter;
     @Inject IntUnderscoreValueConverter intTerminalConverter;
+    @Inject extension ASTUtils
 
     @ValueConverter(rule = "Number")
     def IValueConverter<Long> getNumberConverter() {
@@ -55,7 +57,7 @@ class BalzacConverterService extends DefaultTerminalConverters {
                     return BitcoinUtils.decode(value)
                 }
                 catch (Exception e) {
-                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid hash. Details: "+e.message, node, null);
+                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid hash.", node, e);
                 }
             }
         }
@@ -99,7 +101,7 @@ class BalzacConverterService extends DefaultTerminalConverters {
                     Signature.isValidAndCanonical(BitcoinUtils.decode(value))
                 }
                 catch (Exception e) {
-                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid signature. Details: "+e.message, node, null);
+                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid signature.", node, e);
                 }
                 value
             }
@@ -114,11 +116,13 @@ class BalzacConverterService extends DefaultTerminalConverters {
                 var value = string.split(":").get(1)
 
                 try {
-                    PrivateKey.fromBase58(value)
+                	//TODO: joey: we can't access the network parameters in this stage
+                    //PrivateKey.fromBase58(value, node.getSemanticElement().networkParams);
                     return value;
                 }
                 catch (Exception e) {
-                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid private key. Details: "+e.message, node, null);
+                	e.printStackTrace();
+                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid private key.", node, e);
                 }
             }
         }
@@ -133,11 +137,13 @@ class BalzacConverterService extends DefaultTerminalConverters {
                 var value = string.split(":").get(1)
 
                 try {
-                    Address.fromBase58(value)
+                	//TODO: joey: we can't access the network parameters in this stage
+                    //Address.fromBase58(value, node.getSemanticElement().networkParams)
                     return value;
                 }
-                catch(Exception e)
-                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid address. Details: "+e.message, node, null);
+                catch(Exception e) {
+                    throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid address.", node, e);
+                }
             }
         }
     }

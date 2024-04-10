@@ -26,6 +26,7 @@ import org.bitcoinj.core.Utils;
 
 import xyz.balzaclang.lib.PrivateKeysStore;
 import xyz.balzaclang.lib.model.NetworkType;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 
 public interface ITransactionBuilder extends Serializable {
 
@@ -90,7 +91,7 @@ public interface ITransactionBuilder extends Serializable {
      * @return the builder
      */
     public static ITransactionBuilder fromSerializedTransaction(Transaction tx) {
-        return fromSerializedTransaction(NetworkType.from(tx.getParams()), tx.bitcoinSerialize());
+        return fromSerializedTransaction(BitcoinNetworkType.from(tx.getParams()), tx.bitcoinSerialize());
     }
 
     /**
@@ -101,7 +102,7 @@ public interface ITransactionBuilder extends Serializable {
      * @return the builder
      */
     public static ITransactionBuilder fromSerializedTransaction(NetworkType params, byte[] bytes) {
-        return new SerialTransactionBuilder(params, bytes);
+        return params.deserializeTransaction(bytes);
     }
 
     public static boolean equals(ITransactionBuilder a, ITransactionBuilder b, PrivateKeysStore kstore) {

@@ -37,6 +37,7 @@ import org.junit.Test;
 import xyz.balzaclang.lib.PrivateKeysStore;
 import xyz.balzaclang.lib.model.NetworkType;
 import xyz.balzaclang.lib.model.PrivateKey;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.AbstractScriptBuilderWithVar.ScriptBuilderWithVar;
 import xyz.balzaclang.lib.model.script.primitives.Primitive;
 
@@ -114,8 +115,8 @@ public class ScriptBuilderWithVarTest {
         assertEquals(0, sb.getFreeVariables().size());
         assertEquals(0, sb.signatureSize());
 
-        PrivateKey k1 = PrivateKey.fresh(NetworkType.TESTNET);
-        PrivateKey k2 = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey k1 = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
+        PrivateKey k2 = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
 
         String idK1 = ecks.addKey(k1);
         String idK2 = ecks.addKey(k2);
@@ -160,7 +161,7 @@ public class ScriptBuilderWithVarTest {
 
     @Test
     public void test_serialize_signature1() {
-        PrivateKey key = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey key = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
         SigHash hashType = SigHash.ALL;
         ScriptBuilderWithVar sb = new ScriptBuilderWithVar();
         sb.number(15);
@@ -173,7 +174,7 @@ public class ScriptBuilderWithVarTest {
 
     @Test
     public void test_serialize_signature2() {
-        PrivateKey key = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey key = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
         SigHash hashType = SigHash.ALL;
         ScriptBuilderWithVar sb = new ScriptBuilderWithVar();
         sb.number(15);
@@ -186,7 +187,7 @@ public class ScriptBuilderWithVarTest {
 
     @Test
     public void test_serialize_signature3() {
-        PrivateKey key = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey key = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
         SigHash hashType = SigHash.SINGLE;
         ScriptBuilderWithVar sb = new ScriptBuilderWithVar();
         sb.number(15);
@@ -199,7 +200,7 @@ public class ScriptBuilderWithVarTest {
 
     @Test
     public void test_serialize_signature4() {
-        PrivateKey key = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey key = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
         SigHash hashType = SigHash.SINGLE;
         ScriptBuilderWithVar sb = new ScriptBuilderWithVar();
         sb.number(15);
@@ -212,7 +213,7 @@ public class ScriptBuilderWithVarTest {
 
     @Test
     public void test_serialize_signature5() {
-        PrivateKey key = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey key = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
         SigHash hashType = SigHash.NONE;
         ScriptBuilderWithVar sb = new ScriptBuilderWithVar();
         sb.number(15);
@@ -225,7 +226,7 @@ public class ScriptBuilderWithVarTest {
 
     @Test
     public void test_serialize_signature6() {
-        PrivateKey key = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey key = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
         SigHash hashType = SigHash.NONE;
         ScriptBuilderWithVar sb = new ScriptBuilderWithVar();
         sb.number(15);
@@ -238,7 +239,7 @@ public class ScriptBuilderWithVarTest {
 
     @Test
     public void test_derialize_signature() throws KeyStoreException {
-        PrivateKey key = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey key = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
         String keyID = PrivateKeysStore.getUniqueID(key);
         String serialScript = "15 [sig," + keyID + ",AIAO]";
 

@@ -16,32 +16,32 @@
 
 package xyz.balzaclang.lib.model;
 
-import org.bitcoinj.core.ECKey;
+import java.util.Locale;
 
-import xyz.balzaclang.lib.utils.BitcoinUtils;
+import org.bitcoinj.core.Utils;
 
 public interface PublicKey {
 
     public byte[] getBytes();
 
-    public String getBytesAsString();
+    public default String getBytesAsString() {
+    	return Utils.HEX.encode(this.getBytes());
+    }
 
-    public Address toAddress(NetworkType params);
-
-    public Address toTestnetAddress();
-
-    public Address toMainnetAddress();
+    public default Address toAddress(NetworkType params) {
+        return Address.from(this, params);
+    }
 
     public static PublicKey fromBytes(byte[] pubkey) {
         return new PublicKeyImpl(pubkey);
     }
 
     public static PublicKey fromString(String str) {
-        return fromBytes(BitcoinUtils.decode(str));
+        return fromBytes(Utils.HEX.decode(str.toLowerCase(Locale.ROOT)));
     }
 
-    public static PublicKey fresh() {
-        return fromBytes(new ECKey().getPubKey());
+    public static PublicKey fresh(NetworkType params) {
+        return fromBytes(params.freshPubkey());
     }
 
     public static PublicKey from(PublicKey key) {

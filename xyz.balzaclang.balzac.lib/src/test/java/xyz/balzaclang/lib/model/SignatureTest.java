@@ -23,6 +23,8 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
+
 public class SignatureTest {
 
     @Test
@@ -48,7 +50,7 @@ public class SignatureTest {
     public void testEquality() {
         // two signature are equals despite their public keys
         Signature sigA = new Signature(new byte[] { 1, 2, 3, 4 });
-        Signature sigB = new Signature(new byte[] { 1, 2, 3, 4 }, PublicKey.fresh());
+        Signature sigB = new Signature(new byte[] { 1, 2, 3, 4 }, PublicKey.fresh(BitcoinNetworkType.TESTNET));
 
         assertTrue(sigA.equals(sigB));
         assertTrue(sigA.hashCode() == sigB.hashCode());

@@ -18,36 +18,27 @@ package xyz.balzaclang.lib.model;
 
 import java.util.Arrays;
 
-import org.bitcoinj.core.LegacyAddress;
-
-import xyz.balzaclang.lib.utils.BitcoinUtils;
-
-class AddressImpl implements Address {
+public abstract class AddressImpl implements Address {
 
     private final byte[] address;
     protected final NetworkType params;
 
-    AddressImpl(byte[] address, NetworkType params) {
+    public AddressImpl(byte[] address, NetworkType params) {
         this.address = address;
         this.params = params;
     }
 
     @Override
     public byte[] getBytes() {
-        return Arrays.copyOf(address, address.length);
+        return address.clone();
     }
 
     @Override
-    public String getWif() {
-        return LegacyAddress.fromPubKeyHash(params.toNetworkParameters(), address).toBase58();
-    }
+	public NetworkType getNetworkType() {
+		return this.params;
+	}
 
-    @Override
-    public String getBytesAsString() {
-        return BitcoinUtils.encode(address);
-    }
-
-    @Override
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

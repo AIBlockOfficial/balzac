@@ -23,15 +23,15 @@ import java.security.KeyStoreException;
 
 import org.junit.Test;
 
-import xyz.balzaclang.lib.model.NetworkType;
 import xyz.balzaclang.lib.model.PrivateKey;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 
 public class PrivateKeysStoreTest {
 
     @Test
     public void changePassword() throws KeyStoreException {
         PrivateKeysStore ks = new PrivateKeysStore();
-        PrivateKey k1 = PrivateKey.fresh(NetworkType.TESTNET);
+        PrivateKey k1 = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
 
         // add a key
         String alias1 = ks.addKey(k1);

@@ -125,10 +125,10 @@ class ScriptCompiler {
                 val pubkeyI = input.exps.get(1).interpret(rho)
 
                 if (sigI.failed)
-                    throw new CompileException('''Unable to evaluate to a valid signature''')
+                    throw new CompileException('''Unable to evaluate to a valid signature''', sigI.getRuleFailedException())
 
                 if (pubkeyI.failed)
-                    throw new CompileException('''Unable to evaluate to a valid pubkey''')
+                    throw new CompileException('''Unable to evaluate to a valid pubkey''', pubkeyI.getRuleFailedException())
 
                 if (!(sigI.first instanceof xyz.balzaclang.lib.model.Signature))
                     throw new CompileException('''Unexpected result evaluating the signature. Result is «sigI.first»''')
@@ -343,7 +343,7 @@ class ScriptCompiler {
                     return sb
                 }
             }
-            throw new CompileException('''Unable to evaluate to a private key''')
+            throw new CompileException('''Unable to evaluate to a private key''', resKey.getRuleFailedException())
         }
 
         val key = resKey.first
@@ -399,7 +399,7 @@ class ScriptCompiler {
     def private dispatch ScriptBuilderWithVar compileExpressionInternal(CheckBlockDelay stmt, Context ctx) {
         val res = stmt.exp.interpret(ctx.rho)
         if (res.failed || !(res.first instanceof Long))
-            throw new CompileException('''Unable to interpret relative time from «stmt.nodeToString»''')
+            throw new CompileException('''Unable to interpret relative time from «stmt.nodeToString»''', res.getRuleFailedException())
         val reltime = res.first as Long
         var sb = new ScriptBuilderWithVar
         sb.number(reltime.getSequenceNumber(true, ctx.rho))
@@ -411,7 +411,7 @@ class ScriptCompiler {
     def private dispatch ScriptBuilderWithVar compileExpressionInternal(CheckTimeDelay stmt, Context ctx) {
         val res = stmt.exp.interpret(ctx.rho)
         if (res.failed || !(res.first instanceof Long))
-            throw new CompileException('''Unable to interpret relative time from «stmt.nodeToString»''')
+            throw new CompileException('''Unable to interpret relative time from «stmt.nodeToString»''', res.getRuleFailedException())
         val reltime = res.first as Long
         var sb = new ScriptBuilderWithVar
         sb.number(reltime.getSequenceNumber(false, ctx.rho))
@@ -528,7 +528,7 @@ class ScriptCompiler {
             val resKey = stmt.pubkeys.get(0).interpret(ctx.rho)
 
             if (resKey.failed)
-                throw new CompileException('''Unable to evaluate the key''')
+                throw new CompileException('''Unable to evaluate the key''', resKey.getRuleFailedException())
 
             val key = resKey.first
             if (key instanceof PublicKey) {
@@ -550,7 +550,7 @@ class ScriptCompiler {
                 val resKey = k.interpret(ctx.rho)
 
                 if (resKey.failed)
-                    throw new CompileException('''Unable to evaluate key «k»''')
+                    throw new CompileException('''Unable to evaluate key «k»''', resKey.getRuleFailedException())
 
                 val key = resKey.first
                 if (key instanceof PublicKey) {

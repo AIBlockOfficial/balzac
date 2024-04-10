@@ -20,9 +20,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
+
 public class PrivateKeyTest {
 
-    private NetworkType networkType = NetworkType.TESTNET;
+    private NetworkType networkType = BitcoinNetworkType.TESTNET;
 
     @Test
     public void testCompressedKeysEquality() {

@@ -23,6 +23,7 @@ import org.bitcoinj.script.ScriptPattern;
 import org.junit.Test;
 
 import xyz.balzaclang.lib.model.NetworkType;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
 import xyz.balzaclang.lib.model.transaction.Output;
 
@@ -55,12 +56,12 @@ public class PlaceholderUtilsTest {
 
     @Test
     public void publicKeyIsDerivedFromPrivateOneMainnet() {
-        _publicKeyIsDerivedFromPrivateOne(NetworkType.MAINNET);
+        _publicKeyIsDerivedFromPrivateOne(BitcoinNetworkType.MAINNET);
     }
 
     @Test
     public void publicKeyIsDerivedFromPrivateOneTestnet() {
-        _publicKeyIsDerivedFromPrivateOne(NetworkType.TESTNET);
+        _publicKeyIsDerivedFromPrivateOne(BitcoinNetworkType.TESTNET);
     }
 
     private void _publicKeyIsDerivedFromPrivateOne(NetworkType params) {
@@ -69,12 +70,12 @@ public class PlaceholderUtilsTest {
 
     @Test
     public void addressIsDerivedFromPrivateKeyMainnet() {
-        _addressIsDerivedFromPrivateKey(NetworkType.MAINNET);
+        _addressIsDerivedFromPrivateKey(BitcoinNetworkType.MAINNET);
     }
 
     @Test
     public void addressIsDerivedFromPrivateKeyTestnet() {
-        _addressIsDerivedFromPrivateKey(NetworkType.TESTNET);
+        _addressIsDerivedFromPrivateKey(BitcoinNetworkType.TESTNET);
     }
 
     private void _addressIsDerivedFromPrivateKey(NetworkType params) {
@@ -83,12 +84,12 @@ public class PlaceholderUtilsTest {
 
     @Test
     public void placeholderTransactionMainnet() {
-        _placeholderTransaction(NetworkType.MAINNET);
+        _placeholderTransaction(BitcoinNetworkType.MAINNET);
     }
 
     @Test
     public void placeholderTransactionTestnet() {
-        _placeholderTransaction(NetworkType.TESTNET);
+        _placeholderTransaction(BitcoinNetworkType.TESTNET);
     }
 
     private void _placeholderTransaction(NetworkType params) {

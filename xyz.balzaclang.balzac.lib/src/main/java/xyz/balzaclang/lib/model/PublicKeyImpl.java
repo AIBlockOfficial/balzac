@@ -18,39 +18,17 @@ package xyz.balzaclang.lib.model;
 
 import java.util.Arrays;
 
-import xyz.balzaclang.lib.utils.BitcoinUtils;
-
 class PublicKeyImpl implements PublicKey {
 
     private final byte[] pubkey;
 
     PublicKeyImpl(byte[] pubkey) {
-        this.pubkey = Arrays.copyOf(pubkey, pubkey.length);
+        this.pubkey = pubkey.clone();
     }
 
     @Override
     public byte[] getBytes() {
-        return Arrays.copyOf(pubkey, pubkey.length);
-    }
-
-    @Override
-    public String getBytesAsString() {
-        return BitcoinUtils.encode(pubkey);
-    }
-
-    @Override
-    public Address toAddress(NetworkType params) {
-        return Address.fromPubkey(pubkey, params);
-    }
-
-    @Override
-    public Address toTestnetAddress() {
-        return toAddress(NetworkType.TESTNET);
-    }
-
-    @Override
-    public Address toMainnetAddress() {
-        return toAddress(NetworkType.MAINNET);
+        return pubkey.clone();
     }
 
     @Override

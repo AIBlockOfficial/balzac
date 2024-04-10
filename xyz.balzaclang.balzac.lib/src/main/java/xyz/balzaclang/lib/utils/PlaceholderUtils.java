@@ -22,6 +22,7 @@ import xyz.balzaclang.lib.model.NetworkType;
 import xyz.balzaclang.lib.model.PrivateKey;
 import xyz.balzaclang.lib.model.PublicKey;
 import xyz.balzaclang.lib.model.Signature;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.InputScript;
 import xyz.balzaclang.lib.model.script.OutputScript;
 import xyz.balzaclang.lib.model.transaction.CoinbaseTransactionBuilder;
@@ -33,10 +34,10 @@ public class PlaceholderUtils {
     public static final String STRING = "";
     public static final boolean BOOLEAN = false;
     public static final Hash HASH = new Hash(new byte[0]);
-    public static final Signature SIGNATURE = new Signature(new byte[0], PublicKey.fresh());
+    public static final Signature SIGNATURE = new Signature(new byte[0], PublicKey.fresh(BitcoinNetworkType.TESTNET));
 
-    private static final PrivateKey privateKeyTest = PrivateKey.fresh(NetworkType.TESTNET);
-    private static final PrivateKey privateKeyMain = PrivateKey.fresh(NetworkType.MAINNET);
+    private static final PrivateKey privateKeyTest = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
+    private static final PrivateKey privateKeyMain = PrivateKey.fresh(BitcoinNetworkType.MAINNET);
     private static final PublicKey publicKeyTest = PublicKey.from(privateKeyTest);
     private static final PublicKey publicKeyMain = PublicKey.from(privateKeyMain);
     private static final Address addressTest = Address.from(privateKeyTest);
@@ -55,8 +56,7 @@ public class PlaceholderUtils {
     }
 
     public static ITransactionBuilder TX(NetworkType params) {
-        return params.isTestnet() ? placeholderTransaction(NetworkType.TESTNET)
-            : placeholderTransaction(NetworkType.MAINNET);
+        return placeholderTransaction(params);
     }
 
     private static ITransactionBuilder placeholderTransaction(NetworkType params) {

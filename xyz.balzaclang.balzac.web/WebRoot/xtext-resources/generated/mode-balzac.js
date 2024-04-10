@@ -1,5 +1,5 @@
 define(["codemirror", "codemirror/addon/mode/simple"], function(CodeMirror, SimpleMode) {
-	var keywords = "AIAO|AINO|AISO|BTC|SIAO|SINO|SISO|_|absLock|address|assert|between|block|bool|boolean|checkBlock|checkBlockDelay|checkDate|checkTimeDelay|const|date|else|eval|false|fees|from|fun|hash|hash160|hash256|if|import|input|int|key|mainnet|max|min|network|of|output|package|participant|private|pubkey|relLock|ripemd160|sha1|sha256|sig|signature|size|string|testnet|then|this|toAddress|toPubkey|transaction|true|txid|value|versig|void";
+	var keywords = "AIAO|AINO|AISO|BTC|SIAO|SINO|SISO|_|absLock|address|aiblock|assert|between|bitcoin|block|bool|boolean|checkBlock|checkBlockDelay|checkDate|checkTimeDelay|const|date|else|eval|false|fees|from|fun|hash|hash160|hash256|if|import|input|int|key|mainnet|max|min|network|of|output|package|participant|private|pubkey|relLock|ripemd160|script|sha1|sha256|sig|signature|size|string|testnet|then|this|toAddress|toPubkey|transaction|true|txid|value|versig|void";
 	CodeMirror.defineSimpleMode("xtext/balzac", {
 		start: [
 			{token: "comment", regex: "\\/\\/.*$"},

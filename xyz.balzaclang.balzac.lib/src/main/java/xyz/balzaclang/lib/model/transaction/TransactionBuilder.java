@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutPoint;
@@ -45,6 +46,7 @@ import com.google.common.collect.Sets;
 
 import xyz.balzaclang.lib.PrivateKeysStore;
 import xyz.balzaclang.lib.model.NetworkType;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.InputScript;
 import xyz.balzaclang.lib.model.script.OutputScript;
 import xyz.balzaclang.lib.model.script.primitives.Primitive;
@@ -362,8 +364,10 @@ public class TransactionBuilder implements ITransactionBuilder, EnvI<Primitive, 
     @Override
     public Transaction toTransaction(PrivateKeysStore keystore) {
         checkState(this.isReady(), "the transaction and all its ancestors are not ready");
+        checkState(params instanceof BitcoinNetworkType, "the transaction is not a Bitcoin transaction");
+        NetworkParameters networkParameters = ((BitcoinNetworkType) params).toNetworkParameters();
 
-        Transaction tx = new Transaction(params.toNetworkParameters());
+        Transaction tx = new Transaction(networkParameters);
 
         // set version
         tx.setVersion(2);
@@ -374,17 +378,17 @@ public class TransactionBuilder implements ITransactionBuilder, EnvI<Primitive, 
             if (!input.hasParentTx()) {
                 // coinbase transaction
                 byte[] script = new byte[] {}; // script will be set later
-                TransactionInput txInput = new TransactionInput(params.toNetworkParameters(), tx, script);
+                TransactionInput txInput = new TransactionInput(networkParameters, tx, script);
                 tx.addInput(txInput);
                 checkState(txInput.isCoinBase(), "'txInput' is expected to be a coinbase");
             }
             else {
                 ITransactionBuilder parentTransaction2 = input.getParentTx();
                 Transaction parentTransaction = parentTransaction2.toTransaction(keystore);
-                TransactionOutPoint outPoint = new TransactionOutPoint(params.toNetworkParameters(),
+                TransactionOutPoint outPoint = new TransactionOutPoint(networkParameters,
                     input.getOutIndex(), parentTransaction);
                 byte[] script = new byte[] {}; // script will be set later
-                TransactionInput txInput = new TransactionInput(params.toNetworkParameters(), tx, script, outPoint);
+                TransactionInput txInput = new TransactionInput(networkParameters, tx, script, outPoint);
 
                 // set checksequenseverify (relative locktime)
                 if (input.getLocktime() == UNSET_LOCKTIME) {

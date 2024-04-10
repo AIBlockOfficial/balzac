@@ -45,6 +45,7 @@ class KeyStoreGenerator extends AbstractGenerator {
 
     @Inject extension IQualifiedNameProvider
     @Inject(optional=true) ISecurePreferences secureStorage
+    @Inject extension ASTUtils
 
     override doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
         val models = resource.allContents.toIterable.filter(Model)
@@ -79,7 +80,7 @@ class KeyStoreGenerator extends AbstractGenerator {
             val ecks = new PrivateKeysStore(getKsPassword())
 
             for (k : keys) {
-                val key = PrivateKey.fromBase58(k.value)
+                val key = PrivateKey.fromBase58(k.value, model.networkParams)
                 val alias = ecks.addKey(key)
                 logger.info('''adding key with alias «alias»''')
             }

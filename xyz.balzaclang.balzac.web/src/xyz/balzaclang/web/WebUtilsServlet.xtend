@@ -30,6 +30,7 @@ import xyz.balzaclang.lib.model.Hash
 import xyz.balzaclang.lib.model.Hash.HashAlgorithm
 import xyz.balzaclang.lib.model.NetworkType
 import xyz.balzaclang.lib.model.PrivateKey
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType
 
 @WebServlet(name = 'WebUtils', urlPatterns = '/api/*')
 class WebUtilsServlet extends HttpServlet {
@@ -64,12 +65,12 @@ class WebUtilsServlet extends HttpServlet {
 
     override protected doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
         if (req.requestURI.contains("/api/keys")) {
-            val key = PrivateKey.fresh(NetworkType.TESTNET)
+            val key = PrivateKey.fresh(BitcoinNetworkType.TESTNET)
             val privkeyTestnet = key.wif
-            val privkeyMainnet = key.withNetwork(NetworkType.MAINNET).wif
+            val privkeyMainnet = key.withNetwork(BitcoinNetworkType.MAINNET).wif
             val publickey = key.toPublicKey.bytesAsString
-            val addressTestnet = Address.from(key.toPublicKey, NetworkType.TESTNET).wif
-            val addressMainnet = Address.from(key.toPublicKey, NetworkType.MAINNET).wif
+            val addressTestnet = Address.from(key.toPublicKey, BitcoinNetworkType.TESTNET).wif
+            val addressMainnet = Address.from(key.toPublicKey, BitcoinNetworkType.MAINNET).wif
             val result = new KeyResult(privkeyTestnet, privkeyMainnet, publickey, addressTestnet, addressMainnet)
             response.contentType = 'application/json'
             response.status = HttpServletResponse.SC_OK

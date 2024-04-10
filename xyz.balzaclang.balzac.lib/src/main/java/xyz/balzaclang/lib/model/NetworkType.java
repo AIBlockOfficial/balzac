@@ -15,26 +15,24 @@
  */
 package xyz.balzaclang.lib.model;
 
-import org.bitcoinj.core.NetworkParameters;
+import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
 
-public enum NetworkType {
+public interface NetworkType {
+    boolean isTestnet();
+    boolean isMainnet();
+    
+    NetworkType getTestnet();
+    NetworkType getMainnet();
+    
+    ITransactionBuilder deserializeTransaction(byte[] bytes);
 
-    MAINNET, TESTNET;
+    byte[] freshPubkey();
 
-    public boolean isTestnet() {
-        return this == TESTNET;
-    }
+    PrivateKey privKeyFromWIF(String wif);
+    PrivateKey privKeyFromBytes(byte[] bytes, boolean compressPubkey);
+    PrivateKey freshPrivkey();
 
-    public boolean isMainnet() {
-        return this == MAINNET;
-    }
-
-    public NetworkParameters toNetworkParameters() {
-        return this == TESTNET ? NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
-            : NetworkParameters.fromID(NetworkParameters.ID_MAINNET);
-    }
-
-    public static NetworkType from(NetworkParameters parameters) {
-        return parameters.getId().equals(NetworkParameters.ID_TESTNET) ? TESTNET : MAINNET;
-    }
+    Address addressFromWIF(String wif);
+    Address addressFromPubkey(PublicKey pubkey);
+    Address freshAddress();
 }

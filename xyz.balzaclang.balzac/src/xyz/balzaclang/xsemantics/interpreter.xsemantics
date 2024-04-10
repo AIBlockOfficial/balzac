@@ -266,10 +266,10 @@ from {
 }
 
 axiom InterpretKeyLiteral
-    G |- KeyLiteral key |> Rho rho ~> PrivateKey.fromBase58(key.value)
+    G |- KeyLiteral key |> Rho rho ~> PrivateKey.fromBase58(key.value, rho.networkParams)
 
 axiom InterpretAddressLiteral
-    G |- AddressLiteral addr |> Rho rho ~> Address.fromBase58(addr.value)
+    G |- AddressLiteral addr |> Rho rho ~> Address.fromBase58(addr.value, rho.networkParams)
 
 axiom InterpretPubkeyLiteral
     G |- PubKeyLiteral k |> Rho rho ~> PublicKey.fromString(k.value)

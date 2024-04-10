@@ -16,33 +16,31 @@
 
 package xyz.balzaclang.lib.model;
 
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.LegacyAddress;
+import org.bitcoinj.core.Utils;
 
 public interface Address {
 
     public byte[] getBytes();
 
     public String getWif();
+    
+    public NetworkType getNetworkType();
 
-    public String getBytesAsString();
-
-    public static Address fromBase58(String wif) {
-        LegacyAddress addr = LegacyAddress.fromBase58(null, wif);
-        return new AddressImpl(addr.getHash(), NetworkType.from(addr.getParameters()));
+    public default String getBytesAsString() {
+    	return Utils.HEX.encode(this.getBytes());
     }
 
-    public static Address fromPubkey(byte[] pubkey, NetworkType params) {
-        LegacyAddress addr = LegacyAddress.fromKey(params.toNetworkParameters(), ECKey.fromPublicOnly(pubkey));
-        return new AddressImpl(addr.getHash(), params);
+    public static Address fromBase58(String wif, NetworkType params) {
+    	return params.addressFromWIF(wif);
     }
 
     public static Address from(Address address) {
-        return fromBase58(address.getWif());
+        return fromBase58(address.getWif(), address.getNetworkType());
+    	//return address; //TODO: why was this like this?
     }
 
     public static Address from(PublicKey pubkey, NetworkType params) {
-        return from(pubkey.toAddress(params));
+        return from(params.addressFromPubkey(pubkey));
     }
 
     public static Address from(PrivateKey key) {
@@ -50,7 +48,6 @@ public interface Address {
     }
 
     public static Address fresh(NetworkType params) {
-        LegacyAddress addr = LegacyAddress.fromKey(params.toNetworkParameters(), new ECKey());
-        return new AddressImpl(addr.getHash(), params);
+    	return params.freshAddress();
     }
 }

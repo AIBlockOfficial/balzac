@@ -18,31 +18,26 @@ package xyz.balzaclang.lib.model;
 
 import java.util.Arrays;
 
-import org.bitcoinj.core.ECKey;
-
-import xyz.balzaclang.lib.utils.BitcoinUtils;
-
-class PrivateKeyImpl implements PrivateKey {
+public abstract class PrivateKeyImpl implements PrivateKey {
 
     private final NetworkType params;
-    private final byte[] privkey;
+    protected final byte[] privkey;
     private final boolean compressPubkey;
     private final PublicKey pubkey;
     private final Address address;
 
-    PrivateKeyImpl(byte[] privkey, boolean compressPubkey, NetworkType params) {
+    public PrivateKeyImpl(byte[] privkey, boolean compressPubkey, NetworkType params) {
         this.params = params;
-        this.privkey = Arrays.copyOf(privkey, privkey.length);
+        this.privkey = privkey.clone();
         this.compressPubkey = compressPubkey;
-        this.pubkey = PublicKey.fromBytes(ECKey.fromPrivate(privkey, compressPubkey).getPubKey());
-        this.address = Address.fromPubkey(pubkey.getBytes(), params);
+        this.pubkey = this.toPublicKey(privkey, compressPubkey);
+        this.address = Address.from(pubkey, params);
     }
 
     @Override
     public byte[] getBytes() {
-        return Arrays.copyOf(privkey, privkey.length);
+        return privkey.clone();
     }
-
 
     @Override
     public boolean compressPublicKey() {
@@ -50,19 +45,11 @@ class PrivateKeyImpl implements PrivateKey {
     }
 
     @Override
-    public String getWif() {
-        return ECKey.fromPrivate(privkey, compressPubkey).getPrivateKeyAsWiF(params.toNetworkParameters());
-    }
-
-    @Override
-    public String getBytesAsString() {
-        return BitcoinUtils.encode(privkey);
-    }
-
-    @Override
     public PublicKey toPublicKey() {
         return pubkey;
     }
+    
+    protected abstract PublicKey toPublicKey(byte[] privkey, boolean compressPubkey);
 
     @Override
     public Address toAddress() {
@@ -76,7 +63,7 @@ class PrivateKeyImpl implements PrivateKey {
 
     @Override
     public PrivateKey withNetwork(NetworkType networkType) {
-        return new PrivateKeyImpl(privkey, compressPubkey, networkType);
+    	return networkType == this.params ? this : networkType.privKeyFromBytes(privkey.clone(), compressPubkey);
     }
 
     @Override

@@ -48,6 +48,7 @@ import xyz.balzaclang.balzac.Interpretable;
 import xyz.balzaclang.balzac.KeyLiteral;
 import xyz.balzaclang.balzac.KeyType;
 import xyz.balzaclang.balzac.Literal;
+import xyz.balzaclang.balzac.Model;
 import xyz.balzaclang.balzac.Network;
 import xyz.balzaclang.balzac.NumberLiteral;
 import xyz.balzaclang.balzac.PubKeyLiteral;
@@ -55,6 +56,7 @@ import xyz.balzaclang.balzac.PubkeyType;
 import xyz.balzaclang.balzac.Reference;
 import xyz.balzaclang.balzac.RelativeTime;
 import xyz.balzaclang.balzac.Script;
+import xyz.balzaclang.balzac.ScriptType;
 import xyz.balzaclang.balzac.SignatureLiteral;
 import xyz.balzaclang.balzac.SignatureType;
 import xyz.balzaclang.balzac.StringLiteral;
@@ -71,6 +73,7 @@ import xyz.balzaclang.lib.model.NetworkType;
 import xyz.balzaclang.lib.model.PrivateKey;
 import xyz.balzaclang.lib.model.PublicKey;
 import xyz.balzaclang.lib.model.Signature;
+import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.primitives.Primitive;
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
 import xyz.balzaclang.lib.model.transaction.SerialTransactionBuilder;
@@ -108,7 +111,7 @@ public class ASTUtils {
                         List<KeyLiteral> keys = EcoreUtil2.getAllContentsOfType(root, KeyLiteral.class);
                         keys.add(getPlaceholderPrivateKey(obj));
                         for (KeyLiteral k : keys) {
-                            String uniqueID = kstore.addKey(PrivateKey.fromBase58(k.getValue()));
+                            String uniqueID = kstore.addKey(PrivateKey.fromBase58(k.getValue(), networkParams(obj)));
                             logger.info("keystore: added key " + uniqueID);
                         }
                         return kstore;
@@ -327,19 +330,34 @@ public class ASTUtils {
     }
 
     public NetworkType networkParams(EObject obj) {
+        Model model = (Model) EcoreUtil2.getRootContainer(obj);
+        ScriptType type = model.getScript();
+        
+        if (type == null) //network undeclared, assume bitcoin
+        	return networkParams(obj, BitcoinNetworkType.MAINNET, BitcoinNetworkType.TESTNET);
+
+        switch (type) {
+        	case AI_BLOCK: break; //TODO 
+        	case BITCOIN: return networkParams(obj, BitcoinNetworkType.MAINNET, BitcoinNetworkType.TESTNET);
+        }
+
+        throw new IllegalStateException();
+    }
+
+    private NetworkType networkParams(EObject obj, NetworkType mainnet, NetworkType testnet) {
         List<Network> list = EcoreUtil2.getAllContentsOfType(EcoreUtil2.getRootContainer(obj), Network.class);
 
         if (list.size() == 0) // network undeclared, assume testnet
-            return NetworkType.TESTNET;
+            return testnet;
 
         if (list.size() == 1) {
             Network net = list.get(0);
 
             if (net.isTestnet())
-                return NetworkType.TESTNET;
+                return testnet;
 
             if (net.isMainnet())
-                return NetworkType.MAINNET;
+                return mainnet;
         }
 
         throw new IllegalStateException();

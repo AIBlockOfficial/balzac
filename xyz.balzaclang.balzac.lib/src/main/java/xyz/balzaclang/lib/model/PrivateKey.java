@@ -16,8 +16,7 @@
 
 package xyz.balzaclang.lib.model;
 
-import org.bitcoinj.core.DumpedPrivateKey;
-import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Utils;
 
 public interface PrivateKey {
 
@@ -27,7 +26,9 @@ public interface PrivateKey {
 
     public String getWif();
 
-    public String getBytesAsString();
+    public default String getBytesAsString() {
+    	return Utils.HEX.encode(this.getBytes());
+    }
 
     public PublicKey toPublicKey();
 
@@ -37,19 +38,15 @@ public interface PrivateKey {
 
     public PrivateKey withNetwork(NetworkType networkType);
 
-    public static PrivateKey fromBase58(String wif) {
-        DumpedPrivateKey key = DumpedPrivateKey.fromBase58(null, wif);
-        byte[] keyBytes = key.getKey().getPrivKeyBytes();
-        boolean compressPubkey = key.isPubKeyCompressed();
-        return from(keyBytes, compressPubkey, NetworkType.from(key.getParameters()));
+    public static PrivateKey fromBase58(String wif, NetworkType params) {
+    	return params.privKeyFromWIF(wif);
     }
 
     public static PrivateKey from(byte[] keyBytes, boolean compressPubkey, NetworkType params) {
-        return new PrivateKeyImpl(keyBytes, compressPubkey, params);
+    	return params.privKeyFromBytes(keyBytes, compressPubkey);
     }
 
     public static PrivateKey fresh(NetworkType params) {
-        ECKey key = new ECKey();
-        return from(key.getPrivKeyBytes(), key.isCompressed(), params);
+    	return params.freshPrivkey();
     }
 }
