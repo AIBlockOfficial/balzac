@@ -63,7 +63,7 @@ public class Validator {
         }
 
         try {
-            Transaction tx = txBuilder.toTransaction(keyStore);
+            Transaction tx = (Transaction) txBuilder.toTransaction(keyStore).getInternalTransaction();
             for (int i = 0; i < tx.getInputs().size(); i++) {
                 Script inputScript = tx.getInput(i).getScriptSig();
                 Script outputScript = tx.getInput(i).getOutpoint().getConnectedOutput().getScriptPubKey();

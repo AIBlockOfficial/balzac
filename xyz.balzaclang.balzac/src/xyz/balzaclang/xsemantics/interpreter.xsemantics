@@ -738,7 +738,7 @@ from {
 
     try {
         val tx = txB.toTransaction(op.privateKeysStore)
-        result = new Hash(tx.txId.bytes)
+        result = new Hash(tx.txIdBytes)
     }
     catch (KeyStoreException e) {
         fail

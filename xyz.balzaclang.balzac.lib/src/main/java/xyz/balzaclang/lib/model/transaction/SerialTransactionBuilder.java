@@ -55,8 +55,8 @@ public class SerialTransactionBuilder implements ITransactionBuilder {
     }
 
     @Override
-    public Transaction toTransaction(PrivateKeysStore kstore) {
-        return getTx();
+    public ITransaction toTransaction(PrivateKeysStore kstore) {
+        return this.params.wrapTransaction(this.tx);
     }
 
     @Override
@@ -83,7 +83,6 @@ public class SerialTransactionBuilder implements ITransactionBuilder {
     @Override
     public List<Output> getOutputs() {
         return new AbstractList<Output>() {
-
             @Override
             public Output get(int index) {
                 Script s = getTx().getOutput(index).getScriptPubKey();

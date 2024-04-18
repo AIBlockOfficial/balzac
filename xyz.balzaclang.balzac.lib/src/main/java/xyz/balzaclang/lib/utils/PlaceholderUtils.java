@@ -25,8 +25,8 @@ import xyz.balzaclang.lib.model.Signature;
 import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.InputScript;
 import xyz.balzaclang.lib.model.script.OutputScript;
-import xyz.balzaclang.lib.model.transaction.CoinbaseTransactionBuilder;
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
+import xyz.balzaclang.lib.model.transaction.TransactionBuilder;
 
 public class PlaceholderUtils {
 
@@ -60,8 +60,8 @@ public class PlaceholderUtils {
     }
 
     private static ITransactionBuilder placeholderTransaction(NetworkType params) {
-        CoinbaseTransactionBuilder tx = new CoinbaseTransactionBuilder(params);
-        tx.addInput(InputScript.create().number(42));
+        var tx = params.createTransaction();
+        tx.addCoinbaseInput(InputScript.create().number(42));
         for (int i = 0; i < 10; i++) {
             tx.addOutput(OutputScript.createP2PKH(ADDRESS(params)), 50_000_000_00L);
         }

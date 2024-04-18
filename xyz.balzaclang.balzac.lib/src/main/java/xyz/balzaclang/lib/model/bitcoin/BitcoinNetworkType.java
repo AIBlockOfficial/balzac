@@ -4,6 +4,7 @@ import org.bitcoinj.core.DumpedPrivateKey;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.LegacyAddress;
 import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.core.Transaction;
 
 import xyz.balzaclang.lib.model.Address;
 import xyz.balzaclang.lib.model.AddressImpl;
@@ -11,8 +12,10 @@ import xyz.balzaclang.lib.model.NetworkType;
 import xyz.balzaclang.lib.model.PrivateKey;
 import xyz.balzaclang.lib.model.PrivateKeyImpl;
 import xyz.balzaclang.lib.model.PublicKey;
+import xyz.balzaclang.lib.model.transaction.ITransaction;
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
 import xyz.balzaclang.lib.model.transaction.SerialTransactionBuilder;
+import xyz.balzaclang.lib.model.transaction.bitcoin.BitcoinTransactionBuilder;
 
 public enum BitcoinNetworkType implements NetworkType {
 	MAINNET,
@@ -45,6 +48,11 @@ public enum BitcoinNetworkType implements NetworkType {
     }
 
 	@Override
+	public BitcoinTransactionBuilder createTransaction() {
+		return new BitcoinTransactionBuilder(this);
+	}
+
+	@Override
 	public ITransactionBuilder deserializeTransaction(byte[] bytes) {
 		return new SerialTransactionBuilder(this, bytes);
 	}
@@ -63,7 +71,7 @@ public enum BitcoinNetworkType implements NetworkType {
 
 			@Override
     	    public String getWif() {
-    	        return ECKey.fromPrivate(this.privkey, compressPubkey).getPrivateKeyAsWiF(params.toNetworkParameters());
+    	        return ECKey.fromPrivate(this.privkey, this.compressPublicKey()).getPrivateKeyAsWiF(params.toNetworkParameters());
     	    }
     	};
     }
@@ -109,6 +117,36 @@ public enum BitcoinNetworkType implements NetworkType {
 	@Override
 	public Address freshAddress() {
         return address(LegacyAddress.fromKey(this.toNetworkParameters(), new ECKey()).getHash(), this);
+	}
+	
+	/**
+	 * Gets an {@link ITransaction} which wraps the given bitcoinj transaction.
+	 *
+	 * @param transaction the transaction to wrap
+	 * @return the wrapped transaction
+	 */
+	public ITransaction wrapTransaction(Transaction transaction) {
+		return new ITransaction() {
+			@Override
+			public Object getInternalTransaction() {
+				return transaction;
+			}
+
+			@Override
+			public byte[] serialize() {
+				return transaction.bitcoinSerialize();
+			}
+
+			@Override
+			public byte[] getTxIdBytes() {
+				return transaction.getTxId().getBytes();
+			}
+
+			@Override
+			public NetworkType getNetworkType() {
+				return BitcoinNetworkType.this;
+			}
+		};
 	}
 
 	public static BitcoinNetworkType from(NetworkParameters parameters) {

@@ -23,7 +23,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Sets;
 
-import xyz.balzaclang.lib.model.NetworkType;
 import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.InputScript;
 import xyz.balzaclang.lib.model.script.OutputScript;
@@ -34,8 +33,8 @@ public class TransactionBuilderTest {
 
     @Test
     public void test_coinbase_serialization() {
-        CoinbaseTransactionBuilder net = new CoinbaseTransactionBuilder(BitcoinNetworkType.MAINNET);
-        net.addInput(Input.of(InputScript.create()));
+        var net = BitcoinNetworkType.MAINNET.createTransaction();
+        net.addCoinbaseInput(InputScript.create());
         String s2 = ObjectUtils.serializeObjectToStringQuietly(net);
         ITransactionBuilder net2 = ObjectUtils.deserializeObjectFromStringQuietly(s2, ITransactionBuilder.class);
 
@@ -45,7 +44,7 @@ public class TransactionBuilderTest {
 
     @Test
     public void test_tx_serialization() {
-        TransactionBuilder net = new TransactionBuilder(BitcoinNetworkType.MAINNET);
+    	var net = BitcoinNetworkType.MAINNET.createTransaction();
         net.addInput(Input.of(InputScript.create()));
         String s2 = ObjectUtils.serializeObjectToStringQuietly(net);
         ITransactionBuilder net2 = ObjectUtils.deserializeObjectFromStringQuietly(s2, ITransactionBuilder.class);
@@ -56,7 +55,7 @@ public class TransactionBuilderTest {
 
     @Test
     public void test() {
-        TransactionBuilder tb = new TransactionBuilder(BitcoinNetworkType.MAINNET);
+    	var tb = BitcoinNetworkType.MAINNET.createTransaction();
         tb.addVariable("foo", Primitive.Number.class);
         tb.addVariable("veryLongName", Primitive.String.class);
         tb.addVariable("anotherVeryLongName", Primitive.String.class);
@@ -75,7 +74,7 @@ public class TransactionBuilderTest {
 
     @Test
     public void test_addInput() {
-        TransactionBuilder tb = new TransactionBuilder(BitcoinNetworkType.MAINNET);
+        TransactionBuilder tb = BitcoinNetworkType.MAINNET.createTransaction();
         tb.addVariable("foo", Primitive.Number.class);
 
         Input in = Input.of(InputScript.create().number(5).addVariable("foo", Primitive.String.class), 34);
@@ -90,7 +89,7 @@ public class TransactionBuilderTest {
     @Test
     public void test_hook() {
 
-        TransactionBuilder tb = new TransactionBuilder(BitcoinNetworkType.MAINNET);
+    	var tb = BitcoinNetworkType.MAINNET.createTransaction();
 
         tb.addVariable("a", Primitive.Number.class);
         tb.addVariable("b", Primitive.String.class);

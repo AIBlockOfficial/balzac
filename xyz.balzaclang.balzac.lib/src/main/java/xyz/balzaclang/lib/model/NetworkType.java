@@ -16,6 +16,7 @@
 package xyz.balzaclang.lib.model;
 
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
+import xyz.balzaclang.lib.model.transaction.TransactionBuilder;
 
 public interface NetworkType {
     boolean isTestnet();
@@ -24,6 +25,7 @@ public interface NetworkType {
     NetworkType getTestnet();
     NetworkType getMainnet();
     
+    TransactionBuilder createTransaction();
     ITransactionBuilder deserializeTransaction(byte[] bytes);
 
     byte[] freshPubkey();

@@ -96,14 +96,15 @@ public class Signature {
         int inputIndex,
         SignatureModifier modifier) {
 
-        Transaction tx = txBuilder.toTransaction(keyStore);
+        var tx = txBuilder.toTransaction(keyStore);
 
         Input input = txBuilder.getInputs().get(inputIndex);
         int outputIndex = input.getOutIndex();
         Output output = input.getParentTx().getOutputs().get(outputIndex);
         byte[] outputScript = output.getScript().build().getProgram();
 
-        TransactionSignature sig = tx.calculateSignature(inputIndex, ECKey.fromPrivate(key.getBytes()), outputScript,
+        //TODO: joey: abstract this
+        TransactionSignature sig = ((Transaction) tx.getInternalTransaction()).calculateSignature(inputIndex, ECKey.fromPrivate(key.getBytes()), outputScript,
             modifier.toHashType(), modifier.toAnyoneCanPay());
 
         return new Signature(sig.encodeToBitcoin(), key.toPublicKey());

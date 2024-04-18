@@ -25,7 +25,6 @@ import xyz.balzaclang.balzac.Reference
 import xyz.balzaclang.lib.model.Address
 import xyz.balzaclang.lib.model.script.InputScript
 import xyz.balzaclang.lib.model.script.primitives.Primitive
-import xyz.balzaclang.lib.model.transaction.CoinbaseTransactionBuilder
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder
 import xyz.balzaclang.lib.model.transaction.SerialTransactionBuilder
 import xyz.balzaclang.lib.model.transaction.TransactionBuilder
@@ -72,9 +71,7 @@ class TransactionCompiler {
 
         logger.debug('''START . compiling «tx.name». Rho «rho.entrySet.map[e|'''«e.key.name -> e.value.toString»''']» ''')
 
-        val tb =
-            if (tx.isCoinbase) new CoinbaseTransactionBuilder(tx.networkParams)
-            else new TransactionBuilder(tx.networkParams)
+        val tb = tx.networkParams.createTransaction()
 
         // free variables
         for (param : tx.params) {
@@ -86,13 +83,13 @@ class TransactionCompiler {
 
         // inputs
         for(input : tx.inputs) {
-            if (tb instanceof CoinbaseTransactionBuilder) {
+            if (tx.isCoinbase) {
                 /*
                  * This transaction is like a coinbase transaction.
                  * You can put the input you want.
                  */
                 val inScript = InputScript.create().number(42)
-                tb.addInput(inScript)
+                tb.addCoinbaseInput(inScript)
             }
             else {
                 /*
@@ -146,7 +143,7 @@ class TransactionCompiler {
                      */
 
                     // we use a fresh rho to avoid confusion, since some actual parameters might be bound and other not
-                    val parentTxB = compileTransaction(parentTx, rho.fresh)
+                    val parentTxB = compileTransaction(parentTx, rho.fresh) as TransactionBuilder //TODO: joey: remove this cast once we refactor ITransactionBuilder
                     logger.trace('''input tx compiled: name=«parentTx.name» vars=«parentTxB.variables», fv=«parentTxB.freeVariables»''')
 
                     // now iterate over the actual parameters, in order to bound them into the builder
@@ -281,21 +278,16 @@ class TransactionCompiler {
         return builder.freeVariables
     }
 
-    def private dispatch Collection<String> freeVariables(CoinbaseTransactionBuilder builder) {
-        return new ArrayList<String>()
-    }
-
     def private dispatch Collection<String> freeVariables(SerialTransactionBuilder builder) {
         return new ArrayList<String>()
     }
 
     def private dispatch ITransactionBuilder bindVariable(TransactionBuilder builder, String name, Object value) {
+    	if (builder.isCoinbase()) {
+        	logger.warn('''Unable to bind variable '«name»' and value '«value»' for CoinbaseTransactionBuilder''')
+        	return builder
+    	}
         return builder.bindVariable(name, value.toPrimitive)
-    }
-
-    def private dispatch ITransactionBuilder bindVariable(CoinbaseTransactionBuilder builder, String name, Primitive value) {
-        logger.warn('''Unable to bind variable '«name»' and value '«value»' for CoinbaseTransactionBuilder''')
-        return builder
     }
 
     def private dispatch ITransactionBuilder bindVariable(SerialTransactionBuilder builder, String name, Primitive value) {

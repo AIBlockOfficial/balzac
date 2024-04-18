@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,20 +32,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionInput;
-import org.bitcoinj.core.TransactionOutPoint;
-import org.bitcoinj.script.Script;
-import org.bitcoinj.script.ScriptPattern;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import xyz.balzaclang.lib.PrivateKeysStore;
 import xyz.balzaclang.lib.model.NetworkType;
-import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.InputScript;
 import xyz.balzaclang.lib.model.script.OutputScript;
 import xyz.balzaclang.lib.model.script.primitives.Primitive;
@@ -54,17 +45,17 @@ import xyz.balzaclang.lib.utils.Env;
 import xyz.balzaclang.lib.utils.EnvI;
 import xyz.balzaclang.lib.utils.TablePrinter;
 
-public class TransactionBuilder implements ITransactionBuilder, EnvI<Primitive, TransactionBuilder> {
+public abstract class TransactionBuilder implements ITransactionBuilder, EnvI<Primitive, TransactionBuilder> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final long UNSET_LOCKTIME = -1;
+    protected static final long UNSET_LOCKTIME = -1;
 
-    private transient NetworkType params;
+    protected transient NetworkType params;
 
     private final List<Input> inputs = new ArrayList<>();
     private final List<Output> outputs = new ArrayList<>();
-    private long locktime = UNSET_LOCKTIME;
+    protected long locktime = UNSET_LOCKTIME;
     private final Env<Primitive> env = new Env<>();
 
     private final Map<Set<String>, Consumer<Map<String, Primitive>>> variablesHook = new HashMap<>();
@@ -233,11 +224,6 @@ public class TransactionBuilder implements ITransactionBuilder, EnvI<Primitive, 
 
     /**
      * Add a new transaction input.
-     * <p>
-     * This method is only used by {@link CoinbaseTransactionBuilder} to provide a
-     * valid input. In this way, we avoid to expose other implementation details,
-     * even to subclasses
-     * </p>
      *
      * @param inputScript the input script that redeem {@code tx} at
      *                    {@code outIndex}.
@@ -246,10 +232,9 @@ public class TransactionBuilder implements ITransactionBuilder, EnvI<Primitive, 
      *                                  match its free variables, or the input
      *                                  script free variables are not contained
      *                                  within this tx free variables.
-     * @see CoinbaseTransactionBuilder
      */
-    protected TransactionBuilder addInput(InputScript inputScript) {
-        checkState(this.inputs.size() == 0, "addInput(ScriptBuilder2) can be invoked only once");
+    public TransactionBuilder addCoinbaseInput(InputScript inputScript) {
+        checkState(this.inputs.isEmpty(), "addInput(ScriptBuilder2) can be invoked only once");
         return addInput(Input.of(inputScript));
     }
 
@@ -362,117 +347,7 @@ public class TransactionBuilder implements ITransactionBuilder, EnvI<Primitive, 
     }
 
     @Override
-    public Transaction toTransaction(PrivateKeysStore keystore) {
-        checkState(this.isReady(), "the transaction and all its ancestors are not ready");
-        checkState(params instanceof BitcoinNetworkType, "the transaction is not a Bitcoin transaction");
-        NetworkParameters networkParameters = ((BitcoinNetworkType) params).toNetworkParameters();
-
-        Transaction tx = new Transaction(networkParameters);
-
-        // set version
-        tx.setVersion(2);
-
-        // inputs
-        for (Input input : inputs) {
-
-            if (!input.hasParentTx()) {
-                // coinbase transaction
-                byte[] script = new byte[] {}; // script will be set later
-                TransactionInput txInput = new TransactionInput(networkParameters, tx, script);
-                tx.addInput(txInput);
-                checkState(txInput.isCoinBase(), "'txInput' is expected to be a coinbase");
-            }
-            else {
-                ITransactionBuilder parentTransaction2 = input.getParentTx();
-                Transaction parentTransaction = parentTransaction2.toTransaction(keystore);
-                TransactionOutPoint outPoint = new TransactionOutPoint(networkParameters,
-                    input.getOutIndex(), parentTransaction);
-                byte[] script = new byte[] {}; // script will be set later
-                TransactionInput txInput = new TransactionInput(networkParameters, tx, script, outPoint);
-
-                // set checksequenseverify (relative locktime)
-                if (input.getLocktime() == UNSET_LOCKTIME) {
-                    // see BIP-0065
-                    if (this.locktime != UNSET_LOCKTIME)
-                        txInput.setSequenceNumber(TransactionInput.NO_SEQUENCE - 1);
-                }
-                else {
-                    txInput.setSequenceNumber(input.getLocktime());
-                }
-                tx.addInput(txInput);
-            }
-        }
-
-        // outputs
-        for (Output output : outputs) {
-            // bind free variables
-            OutputScript sb = output.getScript();
-
-            for (String freeVarName : getVariables()) {
-                if (sb.hasVariable(freeVarName) && sb.isFree(freeVarName)) {
-                    sb.bindVariable(freeVarName, this.getValue(freeVarName));
-                }
-            }
-            checkState(sb.isReady(), "script cannot have free variables: " + sb.toString());
-            checkState(sb.signatureSize() == 0);
-
-            Script outScript = sb.getOutputScript();
-            Coin value = Coin.valueOf(output.getValue());
-            tx.addOutput(value, outScript);
-        }
-
-        // set checklocktime (absolute locktime)
-        if (locktime != UNSET_LOCKTIME) {
-            tx.setLockTime(locktime);
-        }
-
-        // set all the signatures within the input scripts (which are never part of the
-        // signature)
-        for (int i = 0; i < tx.getInputs().size(); i++) {
-            TransactionInput txInput = tx.getInputs().get(i);
-            InputScript inputScript = inputs.get(i).getScript();
-
-            // bind free variables
-            for (String freeVarName : getVariables()) {
-                if (inputScript.hasVariable(freeVarName) && inputScript.isFree(freeVarName)) {
-                    inputScript.bindVariable(freeVarName, this.getValue(freeVarName));
-                }
-            }
-
-            checkState(inputScript.isReady(), "script cannot have free variables: " + inputScript.toString());
-
-            byte[] outScript;
-            boolean isP2PKH = false;
-
-            if (txInput.isCoinBase()) {
-                outScript = new byte[] {};
-            }
-            else {
-                // set outScript
-                if (ScriptPattern.isP2SH(txInput.getOutpoint().getConnectedOutput().getScriptPubKey())) {
-                    checkState(inputScript.isP2SH(), "why not?");
-                    outScript = inputScript.getRedeemScript().build().getProgram();
-                }
-                else
-                    outScript = txInput.getOutpoint().getConnectedPubKeyScript();
-
-                // set isP2PKH
-                isP2PKH = ScriptPattern.isP2PKH(txInput.getOutpoint().getConnectedOutput().getScriptPubKey());
-            }
-
-            try {
-                inputScript.setAllSignatures(keystore, tx, i, outScript, isP2PKH);
-            } catch (KeyStoreException e) {
-                throw new RuntimeException(e);
-            }
-            checkState(inputScript.signatureSize() == 0, "all the signatures should have been set");
-
-            // update scriptSig
-            txInput.setScriptSig(inputScript.build());
-        }
-
-        return tx;
-    }
+    public abstract ITransaction toTransaction(PrivateKeysStore keystore);
 
     @Override
     public boolean isCoinbase() {

@@ -28,6 +28,7 @@ import xyz.balzaclang.lib.PrivateKeysStore;
 import xyz.balzaclang.lib.model.NetworkType;
 import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 
+//TODO: joey: most of the methods in this interface should probably be moved to ITransaction or some new ITransactionReader interface, as this interface doesn't actually allow building the transaction outputs 
 public interface ITransactionBuilder extends Serializable {
 
     /**
@@ -47,7 +48,7 @@ public interface ITransactionBuilder extends Serializable {
      *               building.
      * @return a bitcoinj transaction.
      */
-    public abstract Transaction toTransaction(PrivateKeysStore kstore);
+    public abstract ITransaction toTransaction(PrivateKeysStore kstore);
 
     /**
      * Return the inputs.
@@ -85,11 +86,23 @@ public interface ITransactionBuilder extends Serializable {
 
     /**
      * Return a transaction builder from a {@link Transaction}. Same of
+     * <code>fromSerializedTransaction(tx.getNetworkType(), tx.serialize()}</code>
+     *
+     * @param tx a transaction
+     * @return the builder
+     */
+    public static ITransactionBuilder fromSerializedTransaction(ITransaction tx) {
+        return fromSerializedTransaction(tx.getNetworkType(), tx.serialize());
+    }
+
+    /**
+     * Return a transaction builder from a {@link Transaction}. Same of
      * <code>fromSerializedTransaction(tx.getParams(), tx.bitcoinSerialize()}</code>
      *
      * @param tx a bitcoin transaction
      * @return the builder
      */
+    @Deprecated
     public static ITransactionBuilder fromSerializedTransaction(Transaction tx) {
         return fromSerializedTransaction(BitcoinNetworkType.from(tx.getParams()), tx.bitcoinSerialize());
     }
