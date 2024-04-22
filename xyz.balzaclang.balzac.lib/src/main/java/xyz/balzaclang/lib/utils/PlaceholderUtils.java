@@ -26,7 +26,6 @@ import xyz.balzaclang.lib.model.bitcoin.BitcoinNetworkType;
 import xyz.balzaclang.lib.model.script.InputScript;
 import xyz.balzaclang.lib.model.script.OutputScript;
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
-import xyz.balzaclang.lib.model.transaction.TransactionBuilder;
 
 public class PlaceholderUtils {
 
@@ -34,7 +33,7 @@ public class PlaceholderUtils {
     public static final String STRING = "";
     public static final boolean BOOLEAN = false;
     public static final Hash HASH = new Hash(new byte[0]);
-    public static final Signature SIGNATURE = new Signature(new byte[0], PublicKey.fresh(BitcoinNetworkType.TESTNET));
+    public static final Signature SIGNATURE = BitcoinNetworkType.TESTNET.signatureFromBytes(new byte[0], PublicKey.fresh(BitcoinNetworkType.TESTNET));
 
     private static final PrivateKey privateKeyTest = PrivateKey.fresh(BitcoinNetworkType.TESTNET);
     private static final PrivateKey privateKeyMain = PrivateKey.fresh(BitcoinNetworkType.MAINNET);

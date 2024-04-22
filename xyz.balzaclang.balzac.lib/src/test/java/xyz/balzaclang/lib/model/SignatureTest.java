@@ -30,7 +30,7 @@ public class SignatureTest {
     @Test
     public void testCreate() {
         byte[] sigbytes = new byte[] { 1, 2, 3, 4 };
-        Signature sig = new Signature(sigbytes);
+        Signature sig = BitcoinNetworkType.TESTNET.signatureFromBytes(sigbytes, null);
 
         assertTrue(Arrays.equals(sig.getSignature(), sigbytes));
         assertFalse(sig.getPubkey().isPresent());
@@ -39,7 +39,7 @@ public class SignatureTest {
     @Test
     public void testSigImmutability() {
         byte[] sigbytes = new byte[] { 1, 2, 3, 4 };
-        Signature sig = new Signature(sigbytes);
+        Signature sig = BitcoinNetworkType.TESTNET.signatureFromBytes(sigbytes, null);
 
         sigbytes[3] = 0;
         assertFalse("Signature must be immutable", Arrays.equals(sig.getSignature(), sigbytes));
@@ -49,8 +49,8 @@ public class SignatureTest {
     @Test
     public void testEquality() {
         // two signature are equals despite their public keys
-        Signature sigA = new Signature(new byte[] { 1, 2, 3, 4 });
-        Signature sigB = new Signature(new byte[] { 1, 2, 3, 4 }, PublicKey.fresh(BitcoinNetworkType.TESTNET));
+        Signature sigA = BitcoinNetworkType.TESTNET.signatureFromBytes(new byte[] { 1, 2, 3, 4 }, null);
+        Signature sigB = BitcoinNetworkType.TESTNET.signatureFromBytes(new byte[] { 1, 2, 3, 4 }, PublicKey.fresh(BitcoinNetworkType.TESTNET));
 
         assertTrue(sigA.equals(sigB));
         assertTrue(sigA.hashCode() == sigB.hashCode());

@@ -18,11 +18,13 @@ package xyz.balzaclang.lib.model;
 
 import java.util.Arrays;
 
-class PublicKeyImpl implements PublicKey {
+public class PublicKeyImpl implements PublicKey {
 
+    private final NetworkType params;
     private final byte[] pubkey;
 
-    PublicKeyImpl(byte[] pubkey) {
+    public PublicKeyImpl(NetworkType params, byte[] pubkey) {
+    	this.params = params;
         this.pubkey = pubkey.clone();
     }
 
@@ -32,6 +34,11 @@ class PublicKeyImpl implements PublicKey {
     }
 
     @Override
+	public NetworkType getNetworkType() {
+		return this.params;
+	}
+
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

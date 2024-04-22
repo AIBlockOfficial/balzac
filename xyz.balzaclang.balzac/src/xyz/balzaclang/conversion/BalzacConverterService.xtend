@@ -98,7 +98,8 @@ class BalzacConverterService extends DefaultTerminalConverters {
                 val value = string.split(":").get(1)
 
                 try {
-                    Signature.isValidAndCanonical(BitcoinUtils.decode(value))
+                	//TODO: joey: we can't access the network parameters in this stage
+                    //Signature.isValidAndCanonical(BitcoinUtils.decode(value))
                 }
                 catch (Exception e) {
                     throw new ValueConverterException("Couldn't convert input '" + value + "' to a valid signature.", node, e);

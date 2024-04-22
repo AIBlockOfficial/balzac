@@ -20,7 +20,7 @@ import java.util.Locale;
 
 import org.bitcoinj.core.Utils;
 
-public interface PublicKey {
+public interface PublicKey extends INetworkObject {
 
     public byte[] getBytes();
 
@@ -32,20 +32,20 @@ public interface PublicKey {
         return Address.from(this, params);
     }
 
-    public static PublicKey fromBytes(byte[] pubkey) {
-        return new PublicKeyImpl(pubkey);
+    public static PublicKey fromBytes(NetworkType params, byte[] pubkey) {
+    	return params.pubkeyFromBytes(pubkey);
     }
 
-    public static PublicKey fromString(String str) {
-        return fromBytes(Utils.HEX.decode(str.toLowerCase(Locale.ROOT)));
+    public static PublicKey fromString(NetworkType params, String str) {
+        return fromBytes(params, Utils.HEX.decode(str.toLowerCase(Locale.ROOT)));
     }
 
     public static PublicKey fresh(NetworkType params) {
-        return fromBytes(params.freshPubkey());
+        return params.freshPubkey();
     }
 
-    public static PublicKey from(PublicKey key) {
-        return fromBytes(key.getBytes());
+    public static PublicKey from(PublicKey key) { //TODO: why???
+        return key.getNetworkType().pubkeyFromBytes(key.getBytes());
     }
 
     public static PublicKey from(PrivateKey key) {

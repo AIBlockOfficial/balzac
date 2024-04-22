@@ -218,10 +218,10 @@ rule InterpretSignatureLiteral
 from {
     if (s.pubkey !== null) {
         G |- s.pubkey |> rho ~> var PublicKey key
-        sig = new xyz.balzaclang.lib.model.Signature(BitcoinUtils.decode(s.value), key)
+        sig = rho.networkParams.signatureFromBytes(BitcoinUtils.decode(s.value), key)
     }
     else {
-        sig = new xyz.balzaclang.lib.model.Signature(BitcoinUtils.decode(s.value))
+        sig = rho.networkParams.signatureFromBytes(BitcoinUtils.decode(s.value), null)
     }
 }
 
@@ -272,7 +272,7 @@ axiom InterpretAddressLiteral
     G |- AddressLiteral addr |> Rho rho ~> Address.fromBase58(addr.value, rho.networkParams)
 
 axiom InterpretPubkeyLiteral
-    G |- PubKeyLiteral k |> Rho rho ~> PublicKey.fromString(k.value)
+    G |- PubKeyLiteral k |> Rho rho ~> PublicKey.fromString(rho.networkParams, k.value)
 
 rule InterpretTransaction
     G |- Transaction tx |> Rho rho ~> ITransactionBuilder res

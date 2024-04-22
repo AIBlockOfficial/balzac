@@ -18,13 +18,11 @@ package xyz.balzaclang.lib.model;
 
 import org.bitcoinj.core.Utils;
 
-public interface Address {
+public interface Address extends INetworkObject {
 
     public byte[] getBytes();
 
     public String getWif();
-    
-    public NetworkType getNetworkType();
 
     public default String getBytesAsString() {
     	return Utils.HEX.encode(this.getBytes());

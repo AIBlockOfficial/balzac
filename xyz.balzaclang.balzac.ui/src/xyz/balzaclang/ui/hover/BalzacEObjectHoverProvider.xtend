@@ -120,7 +120,7 @@ class BalzacEObjectHoverProvider extends DefaultEObjectHoverProvider {
         '''
 
     def dispatch String getDocumentationInternal(PubKeyLiteral pkey) '''
-        «val pubkey = PublicKey.fromString(pkey.value)»
+        «val pubkey = PublicKey.fromString(pkey.networkParams, pkey.value)»
         <pre>
             Public key
                 hex          = «pubkey.bytesAsString»

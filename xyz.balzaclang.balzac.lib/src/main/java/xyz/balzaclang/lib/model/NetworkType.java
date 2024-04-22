@@ -15,10 +15,22 @@
  */
 package xyz.balzaclang.lib.model;
 
+import xyz.balzaclang.lib.PrivateKeysStore;
 import xyz.balzaclang.lib.model.transaction.ITransactionBuilder;
 import xyz.balzaclang.lib.model.transaction.TransactionBuilder;
 
+import static com.google.common.base.Preconditions.*;
+
 public interface NetworkType {
+	default void checkCompatible(INetworkObject object) {
+		this.checkCompatible(object, "object");
+	}
+
+	default void checkCompatible(INetworkObject object, String desc) {
+		NetworkType objectNetwork = object.getNetworkType();
+		checkArgument(objectNetwork == this, "%s is from network %s (expected: %s)", desc, objectNetwork, this);
+	}
+	
     boolean isTestnet();
     boolean isMainnet();
     
@@ -28,7 +40,8 @@ public interface NetworkType {
     TransactionBuilder createTransaction();
     ITransactionBuilder deserializeTransaction(byte[] bytes);
 
-    byte[] freshPubkey();
+    PublicKey pubkeyFromBytes(byte[] bytes);
+    PublicKey freshPubkey();
 
     PrivateKey privKeyFromWIF(String wif);
     PrivateKey privKeyFromBytes(byte[] bytes, boolean compressPubkey);
@@ -37,4 +50,8 @@ public interface NetworkType {
     Address addressFromWIF(String wif);
     Address addressFromPubkey(PublicKey pubkey);
     Address freshAddress();
+
+    void checkSignatureValidAndCanonical(byte[] signatureBytes);
+    Signature sign(PrivateKey key, ITransactionBuilder txBuilder, PrivateKeysStore keyStore, int inputIndex, SignatureModifier modifier);
+    Signature signatureFromBytes(byte[] bytes, PublicKey pubkey);
 }

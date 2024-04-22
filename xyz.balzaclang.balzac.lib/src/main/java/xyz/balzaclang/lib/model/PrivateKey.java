@@ -18,7 +18,7 @@ package xyz.balzaclang.lib.model;
 
 import org.bitcoinj.core.Utils;
 
-public interface PrivateKey {
+public interface PrivateKey extends INetworkObject {
 
     public byte[] getBytes();
 
@@ -33,8 +33,6 @@ public interface PrivateKey {
     public PublicKey toPublicKey();
 
     public Address toAddress();
-
-    public NetworkType getNetworkType();
 
     public PrivateKey withNetwork(NetworkType networkType);
 
