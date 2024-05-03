@@ -74,8 +74,8 @@ jobs:
         GHR_PATH: xyz.balzaclang.balzac.web/target/balzac.war
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Publish coverage metrics to Coveralls.io
-      run: mvn -B -f xyz.balzaclang.balzac.lib/ jacoco:report coveralls:report -DrepoToken=${{ secrets.COVERALLS_REPO_TOKEN }}
+    # - name: Publish coverage metrics to Coveralls.io
+    #   run: mvn -B -f xyz.balzaclang.balzac.lib/ jacoco:report coveralls:report -DrepoToken=${{ secrets.COVERALLS_REPO_TOKEN }}
 
   docker-build:
     runs-on: ubuntu-latest
