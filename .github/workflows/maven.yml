@@ -109,7 +109,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: balzaclang/balzac
+        images: ${{ vars.REGISTRY }}/${{ vars.REPOSITORY }}
         tags: |
           type=raw,value=latest,enable=${{ inputs.latestTag || false }}
           type=raw,value=test,enable=${{ inputs.testTag || false }}
