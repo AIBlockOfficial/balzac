@@ -11,14 +11,14 @@ on:
     - 'README.md'
   workflow_dispatch:
     inputs:
-      latestTag:
-        description: Tag the image as 'latest'
-        type: boolean
-        default: false
-      testTag:
-        description: Tag the image as 'test'
-        type: boolean
-        default: false
+      tag:
+        description: Tag the image
+        type: string
+        default: 'latest'
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -99,5 +99,6 @@ jobs:
       with:
         REGISTRY: ${{ vars.REGISTRY }}
         REPOSITORY: ${{ vars.REPOSITORY }}
+        TAG: ${{ inputs.tag }}
         BUILD_ARGS: |
           war=balzac.war
