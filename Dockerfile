@@ -30,7 +30,8 @@ RUN cd balzac && mvn -f xyz.balzaclang.balzac.parent/ clean package && mv xyz.ba
 
 # Set up tomcat to run the compiled war
 FROM cgr.dev/chainguard/tomcat:latest
-ENV WAR_FILE=balzac.war
+ARG WAR_FILE_ARG=balzac.war
+ENV WAR_FILE=WAR_FILE_ARG
 
 EXPOSE 8080
 HEALTHCHECK CMD curl --fail http://localhost:8080/balzac/version || exit 1
