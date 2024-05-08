@@ -99,6 +99,6 @@ jobs:
       with:
         REGISTRY: ${{ vars.REGISTRY }}
         REPOSITORY: ${{ vars.REPOSITORY }}
-        TAG: ${{ inputs.tag }}
+        TAG: ${{ inputs.tag || 'latest' }}
         BUILD_ARGS: |
           war=balzac.war
